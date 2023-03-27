@@ -5,11 +5,12 @@ export interface IValidatorReducerHandlers
 }
 //TODO заменить map на list
 export function buildValidatorRegister(
-  nodeState: { [key: symbol]: boolean | undefined },
+  subNodeStates: Array<boolean | undefined>,
   onNodeStateChange: (isValid: boolean) => void,
-): (description?: string) => IValidatorReducerHandlers
+): () => IValidatorReducerHandlers
 {
   let currentNodeValid = false;
+  let index = 0;
   const setNodeValidAndNotify = (isValid: boolean) =>
   {
     currentNodeValid = isValid;
@@ -17,29 +18,28 @@ export function buildValidatorRegister(
   }
   const getCurrentNodeValid = () => currentNodeValid;
 
-  return  (description?: string) => {
-    const id = Symbol(description);
-    nodeState[id] = undefined;
+  return () => {
+    subNodeStates[index] = undefined;
 
-    return buildValidatorHandlers(nodeState, setNodeValidAndNotify, getCurrentNodeValid, id);
+    return buildValidatorHandlers(subNodeStates, setNodeValidAndNotify, getCurrentNodeValid, index++);
   };
 }
 
 function buildValidatorHandlers(
-  nodeState: { [key: symbol]: boolean | undefined },
+  nodeState: Array<boolean | undefined>,
   setNodeValid: (isValid: boolean) => void,
   getNodeValid: () => boolean,
-  id: symbol,
+  index: number,
 ): IValidatorReducerHandlers
 {
   return {
     setValid(isValid: boolean)
     {
-      if (isValid === nodeState[id])
+      if (isValid === nodeState[index])
       {
         return;
       }
-      nodeState[id] = isValid;
+      nodeState[index] = isValid;
       if (isValid !== getNodeValid())
       {
         updateNodeValid(nodeState, setNodeValid);
@@ -47,8 +47,8 @@ function buildValidatorHandlers(
     },
     removeEntry()
     {
-      const isFieldValid = nodeState[id];
-      delete nodeState[id];
+      const isFieldValid = nodeState[index];
+      nodeState.splice(index);
       if (isFieldValid !== undefined && isFieldValid !== getNodeValid())
       {
         updateNodeValid(nodeState, setNodeValid);
@@ -57,9 +57,8 @@ function buildValidatorHandlers(
   }
 }
 
-export function updateNodeValid(state: { [key: symbol]: boolean | undefined }, setNodeValid: (isValid: boolean) => void): void
+export function updateNodeValid(state: Array<boolean | undefined>, setNodeValid: (isValid: boolean) => void): void
 {
-  const values = Object.values<boolean[]>(state);
-  const isAllSubNodesValid = values.filter(v => v !== undefined).every(isValid => isValid);
+  const isAllSubNodesValid = state.filter(v => v !== undefined).every(isValid => isValid);
   setNodeValid(isAllSubNodesValid);
 }

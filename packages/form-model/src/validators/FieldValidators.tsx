@@ -37,7 +37,7 @@ export const FieldValidators: React.FC<PropsWithChildren<FieldValidatorsProps>> 
     return () => innerHandlers.unregister();
   }, [registerContext]);
 
-  const [validatorInfoMap] = useState({} as { [key: symbol]: boolean });
+  const [validatorStates] = useState([] as Array<boolean | undefined>);
   const [isFieldValid, setIsFieldValid] = useState(true);
   const setFieldValidAndNotify = useCallback((isValid: boolean) =>
   {
@@ -46,8 +46,8 @@ export const FieldValidators: React.FC<PropsWithChildren<FieldValidatorsProps>> 
   }, [setIsFieldValid, handlers]);
 
   const registerValidatorContext: IRegisterValidatorContext = useMemo(
-    () => buildRegisterValidatorContext(validatorInfoMap, setFieldValidAndNotify),
-    [validatorInfoMap, setFieldValidAndNotify]);
+    () => buildRegisterValidatorContext(validatorStates, setFieldValidAndNotify),
+    [validatorStates, setFieldValidAndNotify]);
   const fieldValidContext = useMemo(() => ({ isFieldValid }), [isFieldValid]);
 
   return (
@@ -60,14 +60,14 @@ export const FieldValidators: React.FC<PropsWithChildren<FieldValidatorsProps>> 
 }
 
 function buildRegisterValidatorContext(
-  state: { [key: symbol]: boolean },
+  validatorStates: Array<boolean | undefined>,
   setIsFieldValid: (isFieldValid: boolean) => void,
 ): IRegisterValidatorContext
 {
-  const register = buildValidatorRegister(state, setIsFieldValid);
-  const registerValidator = (description?: string): IValidatorHandlers =>
+  const register = buildValidatorRegister(validatorStates, setIsFieldValid);
+  const registerValidator = (): IValidatorHandlers =>
   {
-    const handlers = register(description);
+    const handlers = register();
 
     return {
       notifyValidationEnd: handlers.setValid,

@@ -29,10 +29,10 @@ export const RegisterFormValidatorsContext = createContext({} as IRegisterFormVa
 export const FormValidators: React.FC<PropsWithChildren<FormValidatorsProps>> = (props) =>
 {
   const [isFormValid, setIsFormValid] = useState(true);
-  const [fieldValidStateMap] = useState({} as { [key: symbol]: boolean });
+  const [fieldValidStates] = useState([] as Array<boolean | undefined>);
   const registerFieldValidatorsContext: IRegisterFormValidatorsContext = useMemo(
-    () => buildRegisterValidatorsContainerContext(fieldValidStateMap, setIsFormValid),
-    [setIsFormValid, fieldValidStateMap]);
+    () => buildRegisterValidatorsContainerContext(fieldValidStates, setIsFormValid),
+    [setIsFormValid, fieldValidStates]);
   const formValidContext = useMemo(() => ({ isFormValid }), [isFormValid]);
 
   return (
@@ -45,13 +45,13 @@ export const FormValidators: React.FC<PropsWithChildren<FormValidatorsProps>> = 
 }
 
 function buildRegisterValidatorsContainerContext(
-  fieldValidStateMap: { [key: symbol]: boolean },
+  fieldValidStates: Array<boolean | undefined>,
   setIsFormValid: (isValid: boolean) => void): IRegisterFormValidatorsContext
 {
-  const registerMethod = buildValidatorRegister(fieldValidStateMap, setIsFormValid);
-  const registerFieldValidators = (description?: string): IFieldValidatorsHandlers =>
+  const registerMethod = buildValidatorRegister(fieldValidStates, setIsFormValid);
+  const registerFieldValidators = (): IFieldValidatorsHandlers =>
   {
-    const handlers = registerMethod(description);
+    const handlers = registerMethod();
 
     return {
       setFieldValid(v)
