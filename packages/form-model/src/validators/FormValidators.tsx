@@ -25,7 +25,7 @@ export interface IRegisterFormValidatorsContext
 
 export const RegisterFormValidatorsContext = createContext({} as IRegisterFormValidatorsContext);
 
-//TODO не все FieldValidators регистрируются
+//Fixed не все FieldValidators регистрируются => react dev tools отображало неверное состояние.
 export const FormValidators: React.FC<PropsWithChildren<FormValidatorsProps>> = (props) =>
 {
   const [isFormValid, setIsFormValid] = useState(true);
@@ -33,12 +33,7 @@ export const FormValidators: React.FC<PropsWithChildren<FormValidatorsProps>> = 
   const registerFieldValidatorsContext: IRegisterFormValidatorsContext = useMemo(
     () => buildRegisterValidatorsContainerContext(fieldValidStateMap, setIsFormValid),
     [setIsFormValid, fieldValidStateMap]);
-  const formValidContext = useMemo(() =>
-  {
-    return {
-      isFormValid,
-    }
-  }, [isFormValid]);
+  const formValidContext = useMemo(() => ({ isFormValid }), [isFormValid]);
 
   return (
     <RegisterFormValidatorsContext.Provider value={registerFieldValidatorsContext}>
@@ -59,8 +54,14 @@ function buildRegisterValidatorsContainerContext(
     const handlers = registerMethod(description);
 
     return {
-      setFieldValid: handlers.setValid,
-      unregister: handlers.removeEntry,
+      setFieldValid(v)
+      {
+        handlers.setValid(v);
+      },
+      unregister()
+      {
+        handlers.removeEntry();
+      },
     }
   }
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useState } from "react";
 
 let index = 0;
 // react dev tools видят только один ключ типа symbol, остальные теряются. Если добавить к ним различное описанние, то работант нормально.

@@ -37,18 +37,12 @@ export const ValidatorRegistrar: React.FC<PropsWithChildren<ValidatorRegistrarPr
     handlersRef.current = innerHandlers;
     processDataChange();
 
-    return () => 
-    {
-      innerHandlers.unregister();
-    }
+    return () => innerHandlers.unregister();
   }, [registerContext]);
   useEffect(() => {
     const subscription = dataContext.subscribeValueChange(() => processDataChange());
 
-    return () => 
-    {
-      subscription.unsubscribe();
-    }
+    return () => subscription.unsubscribe();
   }, [dataContext]);
 
   const validatorContext: IValidatorContext = useMemo(() => ({isValid, message: props.validator.message}), [isValid]);

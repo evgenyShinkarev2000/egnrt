@@ -46,9 +46,7 @@ export const FieldValidators: React.FC<PropsWithChildren<FieldValidatorsProps>> 
   }, [setIsFieldValid, handlers]);
 
   const registerValidatorContext: IRegisterValidatorContext = useMemo(
-    () => {
-      return buildRegisterValidatorContext(validatorInfoMap, setFieldValidAndNotify)
-    },
+    () => buildRegisterValidatorContext(validatorInfoMap, setFieldValidAndNotify),
     [validatorInfoMap, setFieldValidAndNotify]);
   const fieldValidContext = useMemo(() => ({ isFieldValid }), [isFieldValid]);
 
